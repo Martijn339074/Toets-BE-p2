@@ -1,0 +1,9 @@
+body {
+    font-family: Verdana;
+}
+
+table, th, td {
+    border: 1px solid grey;
+    border-collapse: collapse;
+    padding:0.3em;
+}
