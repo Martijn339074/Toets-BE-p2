@@ -1,69 +1,56 @@
 <?php
-/**
- * Voeg de inloggegevens toe aan de pagina create.php
- * door het includen van config.php
- */
-include('config/config.php');
+// create.php
 
-/**
- * Maak een datasourcename string om mee te geven aan de 
- * de constructor van de PDO-class
- */
-$dsn = "mysql:host=$dbHost;
-        dbname=$dbName;
-        charset=UTF8";
+include 'config/config.php'; // Voeg een configuratiebestand toe met database-inloggegevens
 
-/**
- * Maak een nieuw object van de PDO-class om verbinding te maken met de
- * MySQL-database
- */
-$pdo = new PDO($dsn, $dbUser, $dbPass);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $pdo = new PDO("mysql:host={$db_host};dbname={$db_name}", $db_user, $db_password);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-/**
- * Het $_POST-array wordt schoongemaakt door een PHP-filter
- */
-$_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $name = $_POST['name'];
+        $networth = $_POST['networth'];
+        $age = $_POST['age'];
+        $myCompany = $_POST['myCompany'];
 
-/**
- * Maak een insert-query om de gegevens uit het formulier weg te schrijven naar
- * de database.
- */
-$sql = "INSERT INTO RichtestPeople (Voornaam
-                            ,Tussenvoegsel
-                            ,Achternaam
-                            ,Wachtwoord)
-        VALUES              (:firstname
-                            ,:infix
-                            ,:lastname
-                            ,:password)";
+        // Gebruik placeholders in de query om SQL-injectie te voorkomen
+        $query = "INSERT INTO RichestPeople (Name, Networth, Age, MyCompany) VALUES (?, ?, ?, ?)";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$name, $networth, $age, $myCompany]);
 
+        echo "Nieuw record is toegevoegd!";
+        header("refresh:2.5;url=index.php"); // Herleid na 2.5 seconden naar index.php
+        exit();
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    }
+}
+?>
 
-/**
- * Prepareer de sql-query met de prepare-method van de PDO class
- */
-$statement = $pdo->prepare($sql);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Record</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <h2>Create New Record</h2>
+    <form method="post" action="">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br>
 
-/**
- * Verbind aan de placeholders de $_POST-waarden met de method bindValue()
- */
-$statement->bindValue(':firstname', $_POST['firstname'], PDO::PARAM_STR);
-$statement->bindValue(':infix', $_POST['infix'], PDO::PARAM_STR);
-$statement->bindValue(':lastname', $_POST['lastname'], PDO::PARAM_STR);
-$statement->bindValue(':password', $_POST['password'], PDO::PARAM_STR);
-/**
- * Voer de query uit op de database
- */
-$statement->execute();
+        <label for="networth">Net Worth:</label>
+        <input type="text" id="networth" name="networth" required><br>
 
-/**
- * Feedback voor de gebruikers dat het opslaan
- * gelukt is.
- */
-echo "De gegevens zijn opgeslagen in de database";
+        <label for="age">Age:</label>
+        <input type="text" id="age" name="age" required><br>
 
-/**
- * De header() functie stuurt de gebruiker naar een andere pagina. In 
- * dit geval na 3,5 seconden
- */
-header('Refresh:3.5; url=index.php');
+        <label for="myCompany">My Company:</label>
+        <input type="text" id="myCompany" name="myCompany" required><br>
 
+        <button type="submit">Add Record</button>
+    </form>
+</body>
+</html>

@@ -5,13 +5,13 @@
  */
 
  // Hieronder staat de database servernaam
- $dbHost = 'localhost';
+ $db_host = 'localhost';
 
  // Naam van de database
- $dbName = 'crud-php-mysql-pdo-2309B';
+ $db_name = 'crud-php-mysql-pdo-2309B';
 
  // Naam van de gebruiker
- $dbUser = 'Martijn';
+ $db_user = 'Martijn';
 
  // Wachtwoord
- $dbPass = '-Ult/Wo02dsBSr0]';
+ $db_password = '-Ult/Wo02dsBSr0]';
